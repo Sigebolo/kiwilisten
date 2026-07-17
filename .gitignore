@@ -1,0 +1,15 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# KiwiListen data (articles, audio, DB)
+data/
+
+# Python
+__pycache__/
+*.pyc

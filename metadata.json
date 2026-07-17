@@ -1,0 +1,6 @@
+{
+  "name": "KiwiListen: NZ English Audio Coach",
+  "description": "An interactive New Zealand English listening and dictation coach featuring local Kiwi stories, sentence-by-sentence looping, interactive word-clicking dictionaries, and a personal vocab book.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

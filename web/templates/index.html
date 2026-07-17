@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KiwiListen — NZ English Listening Coach</title>
+  <link rel="stylesheet" href="/static/kiwi.css" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥝</text></svg>" />
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">K</div>
+        <div>
+          <h1 class="brand-title">KiwiListen</h1>
+          <p class="brand-sub">Aotearoa English Listening Coach</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+
+    <div class="section-header">
+      <h2>📚 Available Lessons</h2>
+      <p>{{ articles|length }} article{{ 's' if articles|length != 1 else '' }} in the library</p>
+    </div>
+
+    {% if not articles %}
+    <div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <h3>No articles yet</h3>
+      <p>Run the scraper first to fetch articles:</p>
+      <pre>python -m pipeline.esl_scraper --all</pre>
+      <p>Then run the aligner:</p>
+      <pre>python -m pipeline.aligner --all</pre>
+    </div>
+
+    {% else %}
+
+    <!-- Status groups -->
+    {% set status_order = ['aligned', 'downloaded', 'fetched', 'error'] %}
+    {% for status in status_order %}
+      {% set group = articles|selectattr('status', 'equalto', status)|list %}
+      {% if group %}
+      <section class="status-group">
+        <h3 class="status-heading status-{{ status }}">
+          {{ {'aligned':'✅ Aligned','downloaded':'⏳ Ready to Align','fetched':'🆕 Fetched','error':'❌ Error'}[status] }}
+        </h3>
+        <div class="article-grid">
+          {% for a in group %}
+          <a href="{{ '/listen/' + a.slug if status == 'aligned' else '#' }}"
+             class="article-card card-{{ status }}
+             {% if status != 'aligned' %}card-disabled{% endif %}">
+            <div class="card-title">{{ a.title }}</div>
+            <div class="card-meta">
+              <span class="badge badge-{{ status }}">{{ status }}</span>
+              <span class="card-slug">{{ a.slug }}</span>
+            </div>
+            {% if status == 'aligned' %}
+            <div class="card-meta" style="margin-top:6px;">
+              {% if a.quiz_stats.attempts > 0 %}
+              <span style="font-size:11px;color:var(--sage);">Quiz: {{ a.quiz_stats.attempts }} attempt{{ 's' if a.quiz_stats.attempts != 1 else '' }} · best {{ a.quiz_stats.best_pct|int }}%</span>
+              {% else %}
+              <span style="font-size:11px;color:var(--clay);">No quiz attempts yet</span>
+              {% endif %}
+            </div>
+            <div class="card-cta">
+              <a href="/listen/{{ a.slug }}" style="color:var(--forest);font-weight:600;">▶ Listen</a>
+              <span style="margin:0 6px;color:var(--tan);">|</span>
+              <a href="/quiz/{{ a.slug }}" style="color:var(--gold);font-weight:600;">📝 Quiz</a>
+            </div>
+            {% elif status == 'downloaded' %}
+            <div class="card-cta">Run: python -m pipeline.aligner {{ a.slug }}</div>
+            {% else %}
+            <div class="card-cta">Pending…</div>
+            {% endif %}
+          </a>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+    {% endfor %}
+
+    {% endif %}
+
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 KiwiListen · Built with NZ English from ESL News NZ</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

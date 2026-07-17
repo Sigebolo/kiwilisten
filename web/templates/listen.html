@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ article.title }} — KiwiListen</title>
+  <link rel="stylesheet" href="/static/kiwi.css" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥝</text></svg>" />
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="back-link">← All Lessons</a>
+      <div class="brand">
+        <div class="brand-icon">K</div>
+        <div>
+          <h1 class="brand-title">KiwiListen</h1>
+          <p class="brand-sub">Aotearoa English Listening Coach</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main player -->
+  <main class="main player-main">
+
+    <div class="lesson-header">
+      <div class="lesson-badge">📻 NZ English · {{ sentences|length }} Sentences</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <h2 class="lesson-title">{{ article.title }}</h2>
+        <a href="/quiz/{{ slug }}" style="padding:5px 14px;background:var(--gold);color:var(--dark);border-radius:20px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;">🎧 Take the Quiz</a>
+      </div>
+      <p class="lesson-slug">{{ slug }}</p>
+    </div>
+
+    <!-- Full-article progress bar -->
+    <div class="progress-section">
+      <div class="progress-times">
+        <span id="time-cur">0:00</span>
+        <span id="time-dur">–:––</span>
+      </div>
+      <div class="progress-track-wrap">
+        <div class="progress-track" id="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+      <!-- Speed control -->
+      <div class="speed-control">
+        <label>Speed:</label>
+        <div class="speed-btns" id="speed-btns">
+          {% for s in [0.5, 0.75, 1.0, 1.25, 1.5] %}
+          <button class="spd-btn{% if s == 1.0 %} spd-active{% endif %}"
+                  data-speed="{{ s }}">{{ s }}x</button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sentence list -->
+    <div class="sentence-list" id="sentence-list">
+      {% for s in sentences %}
+      <div class="sentence-row"
+           id="row-{{ s.sentence_num }}"
+           data-num="{{ s.sentence_num }}"
+           data-start="{{ '%.3f'|format(s.start_sec) }}"
+           data-end="{{ '%.3f'|format(s.end_sec) }}"
+           data-text="{{ s.text|e }}">
+
+        <div class="row-num">{{ s.sentence_num }}</div>
+
+        <div class="row-text">
+          <span class="sentence-text">{{ s.text }}</span>
+        </div>
+
+        <div class="row-controls">
+          <button class="ctrl-btn play-btn"
+                  title="Play sentence"
+                  data-num="{{ s.sentence_num }}">
+            ▶
+          </button>
+          <button class="ctrl-btn loop-btn"
+                  title="Toggle loop"
+                  data-num="{{ s.sentence_num }}">
+            🔁
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Keyboard hints -->
+    <div class="key-hints">
+      <kbd>Space</kbd> play/stop &nbsp;·&nbsp;
+      <kbd>←</kbd> prev &nbsp;·&nbsp;
+      <kbd>→</kbd> next &nbsp;·&nbsp;
+      <kbd>L</kbd> toggle loop on current
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 KiwiListen · Built with NZ English from ESL News NZ</p>
+  </footer>
+
+</div>
+
+<!-- Hidden audio elements -->
+<audio id="audio-main" preload="auto"></audio>
+
+<script>
+  const SLUG   = "{{ slug }}";
+  const SENTENCES = {{ sentences|tojson }};
+</script>
+<script src="/static/js/player.js"></script>
+
+</body>
+</html>
